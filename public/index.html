@@ -22,7 +22,7 @@
 <body>
 
     <style>
-        body{
+        body {
             background-color: #dcdcdc;
         }
     </style>
@@ -38,7 +38,10 @@
                         <i>i</i>
                     </button>
                 </h4>
-            </div>
+            </div>           
+
+            <div class="messages"></div>
+            
 
             <div class="row justify-content-center">
                 <div class="col-10 col-md-12 col-lg-12">
@@ -53,7 +56,8 @@
                                     El archivo .xlsx debe contener los datos de los contactos
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-outline-dark float-end">Export</button>
+                            <button :disabled="isDisabled" type="submit"
+                                class="btn btn-outline-dark float-end">Export</button>
                         </form>
 
                     </div>
@@ -72,18 +76,31 @@
         const app = Vue.createApp({
             data() {
                 return {
-                    message: 'Hello Vue 3!'
+                    message: null,
+                    isDisabled: false,
+                    status: 'danger',
                 }
             },
             methods: {
+
+                // get the current domain and save it in a const
+                getDomain() {
+                    return window.location.origin ?? 'http://localhost:3000';
+                },
                 submitForm() {
+                    this.message = 'Procesando...';
+                    this.isDisabled = true;
+                    this.status = 'warning';
+
                     const input = this.$refs.fileInput;
                     if (!input.files.length) return;
 
                     const formData = new FormData();
                     formData.append('excelFile', input.files[0]);
 
-                    axios.post('http://localhost:3000/export', formData, {
+                    const url = this.getDomain() + '/export';
+
+                    axios.post(url, formData, {
                         responseType: 'blob',
                     })
                         .then(response => {
@@ -93,11 +110,50 @@
                             link.setAttribute('download', `${input.files[0].name.replace('.xlsx', '')}.vcf`);
                             document.body.appendChild(link);
                             link.click();
+
+                            this.message = 'Archivo exportado con éxito';
+                            this.isDisabled = false;
+                            this.status = 'success';
+
+                            this.createAlert();
+
                         })
                         .catch(error => {
                             console.error(error);
+                            this.message = `Error procesando el archivo: --> \n\n ${error}`;
+                            this.isDisabled = false;
+                            this.status = 'danger';
+                            this.createAlert();
                         });
+                        
                 },
+                clearData() {
+                    this.message = null;
+                    this.isDisabled = false;
+                    this.status = 'danger';
+                    // reset the form
+                    this.$refs.fileInput.value = null;
+                },
+                createAlert(){
+                    // function to create a bootstrap 5 alert-closable using the this.message and this.status
+                    let alert = document.createElement('div');
+                    alert.classList.add('alert');
+                    alert.classList.add('alert-' + this.status);
+                    alert.classList.add('alert-dismissible');
+                    alert.classList.add('fade');
+                    alert.classList.add('show');
+                    alert.setAttribute('role', 'alert');
+                    alert.innerHTML = `
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        ${this.message}
+                    `;
+                    document.querySelector('.messages').appendChild(alert);
+
+                    let alertList = document.querySelectorAll('.messages');
+                    alertList.forEach(function (alert) {
+                      new bootstrap.Alert(alert)
+                    })
+                }
             },
         })
 
@@ -119,16 +175,21 @@
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">
-                        Add rows here
+                        Este es un código de Node.js que permite convertir un archivo de Excel en un archivo vCard.
                     </div>
                     <div class="container-fluid">
-                        Add rows here
+                        El archivo de Excel debe contener los siguientes campos:
+                        <ul>
+                            <li>Nombre</li>
+                            <li>Teléfono</li>
+                        </ul>
                     </div>
                     <div class="container-fluid">
-                        Add rows here
+                        Solo debes seleccionar el archivo de Excel y dar clic en el botón Export y automaticamente se
+                        descargará el archivo vCard.
                     </div>
                     <div class="container-fluid">
-                        Add rows here
+                        El archivo vCard se puede importar en cualquier aplicación de contactos.
                     </div>
                 </div>
                 <div class="modal-footer">
