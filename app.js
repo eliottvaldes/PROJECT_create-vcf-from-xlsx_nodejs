@@ -116,6 +116,12 @@ app.get("/", (req, res) => {
 });
 
 
+// return 'no page found' if user try to acces to a page that not exist
+app.use((req, res) => {
+    res.status(404).send("No page found");
+});
+
+
 app.listen(3000, () => {
     console.log("Server running on port 3000");
 });
