@@ -118,6 +118,10 @@ app.get("/", (req, res) => {
     res.sendFile(__dirname + "/public/index.html");
 });
 
+app.get("/inicio", (req, res) => {
+    res.sendFile(__dirname + "/public/index.html");
+});
+
 // when user acces to get('/') return hello world
 app.get("/home", (req, res) => {
     res.send("Hello world!");
