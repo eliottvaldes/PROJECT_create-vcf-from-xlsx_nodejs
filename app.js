@@ -109,6 +109,13 @@ app.post(
 // middelware to use public folder
 app.use(express.static("public"));
 
+
+// when user acces to get('/') return the file /public/index.html
+app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/public/index.html");
+});
+
+
 app.listen(3000, () => {
     console.log("Server running on port 3000");
 });
