@@ -87,8 +87,7 @@ app.post(
 
         const vcf = data.reduce(
             (vcf, { nombre, telefono }) =>
-                vcf + `BEGIN:VCARD\nVERSION:4.0\nFN:${nombre}\nTEL;TYPE=CELL:${telefono}\nEND:VCARD\n`,
-            ""
+                vcf + `BEGIN:VCARD\nVERSION:2.1\nN:${nombre};Twoc -;;;\nFN:Twoc - ${nombre}\nTEL;CELL:${telefono}\nTEL;CELL:${telefono}\nEND:VCARD\n`,""
         );
 
         const vcfFileName = path.join(__dirname, "exports", `${(req.file.originalname).replace('.xlsx', '')}.vcf`);
