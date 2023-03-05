@@ -1,10 +1,17 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const excel = require("exceljs");
 const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
 const { check, validationResult } = require("express-validator");
+
+// middelware to use cors
+app.use(cors());
+// middelware to use public folder
+app.use(express.static("public"));
+
 
 const workbook = new excel.Workbook();
 const workbookCache = {};
@@ -106,13 +113,14 @@ app.post(
     }
 );
 
-// middelware to use public folder
-app.use(express.static("public"));
-
-
 // when user acces to get('/') return the file /public/index.html
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/public/index.html");
+});
+
+// when user acces to get('/') return hello world
+app.get("/home", (req, res) => {
+    res.send("Hello world!");
 });
 
 
